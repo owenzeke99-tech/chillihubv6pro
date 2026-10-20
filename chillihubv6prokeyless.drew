@@ -1,0 +1,278 @@
+-- [[ Chilli Hub V6 Pro - Expanded Key System ]]
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local Player = Players.LocalPlayer
+
+-- Hidden key persistence check (24 hours background storage)
+local KEY_FILE = "ChilliHubV6_KeyData.json"
+local function isKeyValid()
+	if readfile and isfile and isfile(KEY_FILE) then
+		local success, data = pcall(function()
+			return game:GetService("HttpService"):JSONDecode(readfile(KEY_FILE))
+		end)
+		if success and data and data.Expiry and os.time() < data.Expiry then
+			return true
+		end
+	end
+	return false
+end
+
+local function saveKey()
+	if writefile then
+		local data = { Expiry = os.time() + 86400 } -- Saves key valid for 24 hours silently
+		pcall(function()
+			writefile(KEY_FILE, game:GetService("HttpService"):JSONEncode(data))
+		end)
+	end
+end
+
+-- Load main execution script
+local function loadMainScript()
+	local success, err = pcall(function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/kadit9999/stealanegg/refs/heads/main/ChilliV5BaKhi.lua"))()
+	end)
+	if not success then
+		warn("Failed to load main script: " .. tostring(err))
+	end
+end
+
+if isKeyValid() then
+	loadMainScript()
+	return
+end
+
+-- Clear existing UI if re-executed
+if CoreGui:FindFirstChild("ChilliHubV6KeySystem") then
+	CoreGui.ChilliHubV6KeySystem:Destroy()
+end
+
+-- ScreenGui Setup
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ChilliHubV6KeySystem"
+ScreenGui.Parent = CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Main Container
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 14)
+MainFrame.BackgroundTransparency = 0.05
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.5, -210, 0.5, -135)
+MainFrame.Size = UDim2.new(0, 420, 0, 270)
+MainFrame.ClipsDescendants = true
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 14)
+MainCorner.Parent = MainFrame
+
+-- Neon Red Outer Stroke
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Parent = MainFrame
+UIStroke.Color = Color3.fromRGB(255, 30, 50)
+UIStroke.Thickness = 1.8
+UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+-- Top Accent Line
+local HeaderLine = Instance.new("Frame")
+HeaderLine.Name = "HeaderLine"
+HeaderLine.Parent = MainFrame
+HeaderLine.BackgroundColor3 = Color3.fromRGB(255, 30, 50)
+HeaderLine.BorderSizePixel = 0
+HeaderLine.Position = UDim2.new(0, 0, 0, 0)
+HeaderLine.Size = UDim2.new(1, 0, 0, 4)
+
+-- Title Header
+local Title = Instance.new("TextLabel")
+Title.Parent = MainFrame
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 0, 0, 18)
+Title.Size = UDim2.new(1, 0, 0, 32)
+Title.Font = Enum.Font.FredokaOne
+Title.Text = "CHILLI HUB V6 PRO"
+Title.TextColor3 = Color3.fromRGB(255, 45, 65)
+Title.TextSize = 24
+Title.TextStrokeTransparency = 0.8
+Title.TextStrokeColor3 = Color3.fromRGB(150, 0, 20)
+
+-- Subtitle Header
+local SubTitle = Instance.new("TextLabel")
+SubTitle.Parent = MainFrame
+SubTitle.BackgroundTransparency = 1
+SubTitle.Position = UDim2.new(0, 0, 0, 50)
+SubTitle.Size = UDim2.new(1, 0, 0, 16)
+SubTitle.Font = Enum.Font.GothamMedium
+SubTitle.Text = "KEY AUTHENTICATION SYSTEM"
+SubTitle.TextColor3 = Color3.fromRGB(140, 140, 150)
+SubTitle.TextSize = 11
+
+-- Key Input Field Box Container
+local InputContainer = Instance.new("Frame")
+InputContainer.Parent = MainFrame
+InputContainer.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
+InputContainer.BorderSizePixel = 0
+InputContainer.Position = UDim2.new(0.06, 0, 0, 82)
+InputContainer.Size = UDim2.new(0.88, 0, 0, 48)
+InputContainer.ClipsDescendants = true
+
+local InputCorner = Instance.new("UICorner")
+InputCorner.CornerRadius = UDim.new(0, 9)
+InputCorner.Parent = InputContainer
+
+local InputStroke = Instance.new("UIStroke")
+InputStroke.Parent = InputContainer
+InputStroke.Color = Color3.fromRGB(45, 45, 55)
+InputStroke.Thickness = 1
+
+local TextBox = Instance.new("TextBox")
+TextBox.Parent = InputContainer
+TextBox.BackgroundTransparency = 1
+TextBox.Position = UDim2.new(0.03, 0, 0, 0)
+TextBox.Size = UDim2.new(0.94, 0, 1, 0)
+TextBox.Font = Enum.Font.GothamSemibold
+TextBox.PlaceholderText = "Enter key here..."
+TextBox.PlaceholderColor3 = Color3.fromRGB(90, 90, 105)
+TextBox.Text = ""
+TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextBox.TextSize = 13
+TextBox.ClearTextOnFocus = false
+TextBox.ClipsDescendants = true
+TextBox.TextTruncate = Enum.TextTruncate.AtEnd
+
+-- Status Message Display
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Parent = MainFrame
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Position = UDim2.new(0.06, 0, 0, 138)
+StatusLabel.Size = UDim2.new(0.88, 0, 0, 20)
+StatusLabel.Font = Enum.Font.GothamBold
+StatusLabel.Text = ""
+StatusLabel.TextColor3 = Color3.fromRGB(255, 60, 60)
+StatusLabel.TextSize = 12
+
+-- Side-by-Side Action Buttons Container
+local ButtonContainer = Instance.new("Frame")
+ButtonContainer.Parent = MainFrame
+ButtonContainer.BackgroundTransparency = 1
+ButtonContainer.Position = UDim2.new(0.06, 0, 0, 172)
+ButtonContainer.Size = UDim2.new(0.88, 0, 0, 48)
+
+-- Get Key Button (Left Side)
+local GetKeyBtn = Instance.new("TextButton")
+GetKeyBtn.Parent = ButtonContainer
+GetKeyBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
+GetKeyBtn.BorderSizePixel = 0
+GetKeyBtn.Position = UDim2.new(0, 0, 0, 0)
+GetKeyBtn.Size = UDim2.new(0.48, 0, 1, 0)
+GetKeyBtn.Font = Enum.Font.GothamBold
+GetKeyBtn.Text = "GET KEY"
+GetKeyBtn.TextColor3 = Color3.fromRGB(220, 220, 230)
+GetKeyBtn.TextSize = 13
+GetKeyBtn.AutoButtonColor = false
+
+local GetCorner = Instance.new("UICorner")
+GetCorner.CornerRadius = UDim.new(0, 9)
+GetCorner.Parent = GetKeyBtn
+
+local GetStroke = Instance.new("UIStroke")
+GetStroke.Parent = GetKeyBtn
+GetStroke.Color = Color3.fromRGB(55, 55, 68)
+GetStroke.Thickness = 1
+
+-- Check Key Button (Right Side)
+local CheckKeyBtn = Instance.new("TextButton")
+CheckKeyBtn.Parent = ButtonContainer
+CheckKeyBtn.BackgroundColor3 = Color3.fromRGB(220, 25, 45)
+CheckKeyBtn.BorderSizePixel = 0
+CheckKeyBtn.Position = UDim2.new(0.52, 0, 0, 0)
+CheckKeyBtn.Size = UDim2.new(0.48, 0, 1, 0)
+CheckKeyBtn.Font = Enum.Font.GothamBold
+CheckKeyBtn.Text = "CHECK KEY"
+CheckKeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CheckKeyBtn.TextSize = 13
+CheckKeyBtn.AutoButtonColor = false
+
+local CheckCorner = Instance.new("UICorner")
+CheckCorner.CornerRadius = UDim.new(0, 9)
+CheckCorner.Parent = CheckKeyBtn
+
+-- Button Hover Effects
+GetKeyBtn.MouseEnter:Connect(function()
+	TweenService:Create(GetKeyBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(45, 45, 58)}):Play()
+end)
+GetKeyBtn.MouseLeave:Connect(function()
+	TweenService:Create(GetKeyBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(30, 30, 38)}):Play()
+end)
+
+CheckKeyBtn.MouseEnter:Connect(function()
+	TweenService:Create(CheckKeyBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 40, 60)}):Play()
+end)
+CheckKeyBtn.MouseLeave:Connect(function()
+	TweenService:Create(CheckKeyBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(220, 25, 45)}):Play()
+end)
+
+-- Smooth Shake Animation on Invalid Key
+local function smoothShake()
+	local basePos = UDim2.new(0.5, -210, 0.5, -135)
+	local shakeOffsets = {14, -12, 10, -8, 5, -3, 0}
+	
+	task.spawn(function()
+		for _, offset in ipairs(shakeOffsets) do
+			local targetPos = UDim2.new(basePos.X.Scale, basePos.X.Offset + offset, basePos.Y.Scale, basePos.Y.Offset)
+			local tween = TweenService:Create(MainFrame, TweenInfo.new(0.04, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = targetPos})
+			tween:Play()
+			tween.Completed:Wait()
+		end
+		MainFrame.Position = basePos
+	end)
+end
+
+-- Input Error Glow Flash
+local function flashError()
+	TweenService:Create(InputStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(255, 40, 60)}):Play()
+	task.delay(0.8, function()
+		TweenService:Create(InputStroke, TweenInfo.new(0.3), {Color = Color3.fromRGB(45, 45, 55)}):Play()
+	end)
+end
+
+-- Get Key Action (Copies custom link4m URL)
+GetKeyBtn.MouseButton1Click:Connect(function()
+	if setclipboard then
+		setclipboard("https://link4m.org/YEXQkw")
+		StatusLabel.TextColor3 = Color3.fromRGB(100, 200, 255)
+		StatusLabel.Text = "Key link copied to clipboard!"
+	else
+		StatusLabel.TextColor3 = Color3.fromRGB(255, 200, 80)
+		StatusLabel.Text = "Clipboard function not supported."
+	end
+end)
+
+-- Check Key Action
+CheckKeyBtn.MouseButton1Click:Connect(function()
+	local enteredKey = TextBox.Text
+	local correctKey = "ChilliHubV6ProJskwowiLapwowhebiBakaowowjwkPqpwiow"
+
+	if enteredKey == correctKey then
+		StatusLabel.TextColor3 = Color3.fromRGB(60, 255, 120)
+		StatusLabel.Text = "Access Granted! Loading..."
+		saveKey() -- Saves status quietly for 24h
+		
+		TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -210, 0.5, -160), BackgroundTransparency = 1}):Play()
+		TweenService:Create(UIStroke, TweenInfo.new(0.4), {Transparency = 1}):Play()
+		
+		task.wait(0.5)
+		ScreenGui:Destroy()
+		loadMainScript()
+	else
+		StatusLabel.TextColor3 = Color3.fromRGB(255, 60, 60)
+		StatusLabel.Text = "Invalid Key! Please try again."
+		
+		smoothShake()
+		flashError()
+		
+		-- Auto-clear input text on error
+		TextBox.Text = ""
+	end
+end)
